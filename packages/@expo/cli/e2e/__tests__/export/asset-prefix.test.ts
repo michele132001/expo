@@ -41,6 +41,10 @@ describe('static-rendering with a custom asset prefix url', () => {
       expect(bundleContent).toMatch(
         /uri\:"https\:\/\/cdn\.example\.dev\/assets\/__e2e__\/asset\/assets\/react-logo\.[a-z0-9]+\.png\:/i
       );
+
+      console.log(
+        fs.readFileSync(path.join(outputDir, 'index.html'), 'utf8')
+      )
     },
     // Could take 45s depending on how fast the bundler resolves
     560 * 1000
