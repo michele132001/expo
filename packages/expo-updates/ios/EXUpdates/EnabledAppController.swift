@@ -9,8 +9,6 @@ import ExpoModulesCore
  * Updates controller for applications that have updates enabled and properly-configured.
  */
 public class EnabledAppController: InternalAppControllerInterface, StartupProcedureDelegate {
-  private static let ErrorDomain = "EXUpdatesAppController"
-
   public weak var delegate: AppControllerDelegate?
 
   internal let config: UpdatesConfig

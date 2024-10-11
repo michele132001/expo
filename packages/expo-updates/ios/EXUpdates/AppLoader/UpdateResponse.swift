@@ -2,9 +2,20 @@
 
 import React
 
-internal enum RemoteUpdateError: Error {
+internal enum RemoteUpdateError: Error, Sendable {
   case directiveParsingError
-  case invalidDirectiveType
+  case invalidDirectiveType(messageType: String)
+}
+
+extension RemoteUpdateError: LocalizedError {
+  public var errorDescription: String? {
+    switch self {
+    case .directiveParsingError:
+      return "Directive JSON could not be parsed"
+    case let .invalidDirectiveType(messageType):
+      return "Unsupported directive type: \(messageType)"
+    }
+  }
 }
 
 internal final class SigningInfo {
@@ -50,7 +61,7 @@ public class UpdateDirective: NSObject {
       }
       return RollBackToEmbeddedUpdateDirective(commitTime: commitTime, signingInfo: signingInfo)
     default:
-      throw RemoteUpdateError.invalidDirectiveType
+      throw RemoteUpdateError.invalidDirectiveType(messageType: messageType)
     }
   }
 }

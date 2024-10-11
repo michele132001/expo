@@ -25,7 +25,7 @@ import Foundation
  *   EXUpdatesRequestHeaders
  */
 internal final class UpdatesBuildData {
-  static func ensureBuildDataIsConsistentAsync(database: UpdatesDatabase, config: UpdatesConfig) {
+  static func ensureBuildDataIsConsistentAsync(database: UpdatesDatabase, config: UpdatesConfig, logger: UpdatesLogger) {
     database.databaseQueue.async {
       let scopeKey = config.scopeKey
 
@@ -33,7 +33,7 @@ internal final class UpdatesBuildData {
       do {
         staticBuildData = try database.staticBuildData(withScopeKey: scopeKey)
       } catch {
-        NSLog("Error getting static build data: %@", [error.localizedDescription])
+        logger.warn(message: "Error getting static build data: \(error.localizedDescription)")
         return
       }
 
@@ -48,7 +48,7 @@ internal final class UpdatesBuildData {
         do {
           try database.setStaticBuildData(getBuildDataFromConfig(config), withScopeKey: scopeKey)
         } catch {
-          NSLog("Error setting static build data: %@", [error.localizedDescription])
+          logger.warn(message: "Error setting static build data: \(error.localizedDescription)")
           return
         }
       }
@@ -62,11 +62,12 @@ internal final class UpdatesBuildData {
     ]
   }
 
-  static func clearAllUpdatesAndSetStaticBuildData(database: UpdatesDatabase, config: UpdatesConfig, scopeKey: String) {
+  static func clearAllUpdatesAndSetStaticBuildData(database: UpdatesDatabase, config: UpdatesConfig, logger: UpdatesLogger, scopeKey: String) {
     let allUpdates: [Update]
     do {
       allUpdates = try database.allUpdates(withConfig: config)
     } catch {
+      logger.warn(message: "Error loading updates from database: \(error.localizedDescription)")
       NSLog("Error loading updates from database: %@", [error.localizedDescription])
       return
     }

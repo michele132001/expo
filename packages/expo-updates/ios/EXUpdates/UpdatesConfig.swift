@@ -25,11 +25,23 @@ public enum CheckAutomaticallyConfig: Int {
   }
 }
 
-@objc(EXUpdatesConfigError)
-public enum UpdatesConfigError: Int, Error {
+public enum UpdatesConfigError: Error, Sendable {
   case ExpoUpdatesConfigPlistError
   case ExpoUpdatesConfigMissingURLError
   case ExpoUpdatesMissingRuntimeVersionError
+}
+
+extension UpdatesConfigError: LocalizedError {
+  public var errorDescription: String? {
+    switch self {
+    case .ExpoUpdatesConfigPlistError:
+      return "Expo.plist not found in bundle or invalid"
+    case .ExpoUpdatesConfigMissingURLError:
+      return "Config for expo-updates missing URL"
+    case .ExpoUpdatesMissingRuntimeVersionError:
+      return "Config for expo-updates missing runtime version"
+    }
+  }
 }
 
 public enum UpdatesConfigurationValidationResult {

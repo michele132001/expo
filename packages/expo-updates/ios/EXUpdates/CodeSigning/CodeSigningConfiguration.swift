@@ -135,8 +135,7 @@ public final class CodeSigningConfiguration: NSObject {
       return true
     } else {
       if let error = error, (error.takeRetainedValue() as Error as NSError).code != errSecVerifyFailed {
-        NSLog("Sec key signature verification error: %@", error.takeRetainedValue().localizedDescription)
-        throw CodeSigningError.SecurityFrameworkError
+        throw CodeSigningError.SecurityFrameworkSecKeyVerificationError(cause: error.takeRetainedValue())
       }
       return false
     }

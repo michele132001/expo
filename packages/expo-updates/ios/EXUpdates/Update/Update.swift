@@ -72,10 +72,20 @@ public enum UpdateStatus: Int {
   case StatusDevelopment = 6
 }
 
-@objc(EXUpdatesUpdateError)
-public enum UpdateError: Int, Error {
-  case invalidExpoProtocolVersion
+public enum UpdateError: Error, Sendable {
+  case invalidExpoProtocolVersion(protocolVersion: Int)
   case legacyManifestInstantiationInvalid
+}
+
+extension UpdateError: LocalizedError {
+  public var errorDescription: String? {
+    switch self {
+    case let .invalidExpoProtocolVersion(protocolVersion):
+      return "Invalid Expo Updates protocol version: \(protocolVersion)"
+    case .legacyManifestInstantiationInvalid:
+      return "This version of expo-updates can no longer load legacy manifests"
+    }
+  }
 }
 
 @objc(EXUpdatesUpdate)
@@ -136,10 +146,10 @@ public class Update: NSObject {
     config: UpdatesConfig,
     database: UpdatesDatabase
   ) throws -> Update {
-    let protocolVersion = responseHeaderData.protocolVersion
-    switch protocolVersion {
-    case nil:
+    guard let protocolVersion = responseHeaderData.protocolVersion else {
       throw UpdateError.legacyManifestInstantiationInvalid
+    }
+    switch protocolVersion {
     case 0, 1:
       return ExpoUpdatesUpdate.update(
         withExpoUpdatesManifest: ExpoUpdatesManifest(rawManifestJSON: withManifest),
@@ -148,7 +158,7 @@ public class Update: NSObject {
         database: database
       )
     default:
-      throw UpdateError.invalidExpoProtocolVersion
+      throw UpdateError.invalidExpoProtocolVersion(protocolVersion: protocolVersion)
     }
   }
 

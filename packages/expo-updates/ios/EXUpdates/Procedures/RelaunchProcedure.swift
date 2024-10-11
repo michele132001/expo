@@ -85,7 +85,7 @@ final class RelaunchProcedure: StateMachineProcedure {
           procedureContext.onComplete()
         } else {
           // swiftlint:disable:next force_unwrapping
-          NSLog("Failed to relaunch: %@", error!.localizedDescription)
+          self.logger.error(cause: UpdatesError.relaunchProcedureFailedToRelaunch(cause: error!))
           self.errorBlock(UpdatesReloadException())
           procedureContext.onComplete()
         }
